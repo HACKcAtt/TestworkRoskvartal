@@ -1,0 +1,54 @@
+﻿@model IEnumerable<TestWork.Models.ClinicalDepartment>
+
+@{
+    ViewData["Title"] = "Отделения";
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="page" style="display: none"></div>
+
+<p>
+    @if (User.IsInRole("Registrator"))
+    {
+        <a asp-action="Create" id="create_instance">Добавить новое отделение</a>
+    }
+</p>
+
+<div class="row">
+    <div class="col-md-4">
+        <p><i>Поиск отделения по названию:</i></p>
+        <div class="input-group">
+            <span class="input-group-btn">
+                <button class="btn btn-default" id="instance_search_button" type="submit" data-href="@Url.Action("Index")" data-ajax="@Url.Action("GetClinicalDepartmentsTable")"><span class="glyphicon glyphicon-search"></span></button>
+            </span>
+            <input type="text" name="searchString" id="instance_search_input_field" class="form-control" placeholder="Искать...">
+        </div>
+    </div>
+</div>
+
+@* Отрисовка секции с таблицей сущностей. *@
+<div id="instances_list" data-url="@Url.Action("GetClinicalDepartmentsTable")">
+    @Html.Partial("GetClinicalDepartmentsTable", Model)
+</div>
+@* Меню выбора количества профилей для отрисовки на одной странице. *@
+<div id="instances_per_page_choosing_menu">
+    <table>
+        <tr>
+            <td valign="bottom"><p><nobr>Выберите количество отделений для отображения на странице:&nbsp;</nobr></p></td>
+            <td>
+                <select class="form-control instances-per-page-for-display col-lg-3" style="width: 70px">
+                    <option selected="" disabled>--- Выберите количество отделений для отображения на странице ---</option>
+                    <option selected value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="All">Все</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+</div>
+
+@section scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

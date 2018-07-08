@@ -1,0 +1,103 @@
+﻿@model TestWork.ViewModels.DoctorsViewModel
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Добавление нового посещения врача";
+    ViewData["SubTitle"] = "Детали посещения";
+    ViewData["SubTitle2"] = "Запись на посещение";
+}
+
+@if (Model.Doctor.DoctorsId == 0)
+{
+    <p id="instance_for_addition" style="display: none"></p>
+}
+<p id="controller_name" style="display: none">Doctors</p>
+<p id="create_appointment" style="display: none"/>
+<h2 id="instance_header">@ViewData["Title"]</h2>
+
+<h4>@ViewData["SubTitle"]</h4>
+<hr />
+<form asp-action="CreateDoctorsAppointment" id="instance_form" data-list-url="@Url.Action("Index")">
+    <div class="row">
+        <div class="col-md-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" id="doctor_id" value="@Model.Doctor.DoctorsId" asp-for="Doctor.DoctorsId" />
+            <input type="hidden" id="doctor_appointment_id" value="@Model.DoctorsAppointment.DoctorAppointmentsId" asp-for="DoctorsAppointment.DoctorAppointmentsId" />
+            @{
+                int currentCustomerId = Model.Customers.CustomerId;
+            }
+            <p type="hidden" id="href_id" data-href='@Url.Action("CreateDoctorsAppointment", "Doctors", new { id = Model.Doctor.DoctorsId }, null)' />
+            <input type="hidden" asp-for="DoctorsAppointment.CustomerId" value="@currentCustomerId" />
+            <dl id="details_delete_instance_form_dl" class="dl-horizontal" style=" grid-template-columns: max-content">
+                <dt title="@Html.DisplayNameFor(model => (new Doctors()).DoctorsName)">
+                    @Html.DisplayNameFor(model => (new Doctors()).DoctorsName)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Doctor.DoctorsName)
+                </dd>
+                <dt title="@Html.DisplayNameFor(model => (new Doctors()).DoctorsSpecialization)">
+                    @Html.DisplayNameFor(model => (new Doctors()).DoctorsSpecialization)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Doctor.DoctorsSpecialization)
+                </dd>
+                <dt title="@Html.DisplayNameFor(model => (new Doctors()).DoctorsPhoneNumber)">
+                    @Html.DisplayNameFor(model => (new Doctors()).DoctorsPhoneNumber)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Doctor.DoctorsPhoneNumber)
+                </dd>
+                <dt title="@Html.DisplayNameFor(model => (new Doctors()).ClinicalDepartment.ClinicalDepartmentName)">
+                    @Html.DisplayNameFor(model => (new Doctors()).ClinicalDepartment.ClinicalDepartmentName)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Doctor.ClinicalDepartment.ClinicalDepartmentName)
+                </dd>
+            </dl>
+            <hr />
+            <h4>@ViewData["SubTitle2"]</h4>
+            <div class="form-group">
+                <span class="glyphicon glyphicon-calendar">&nbsp;</span><label class="control-label">Выбор даты</label><br />
+                <input asp-for="DoctorsAppointment.DoctorAppointmentsDate" class="form-control instance-date-input" />
+                <span asp-validation-for="DoctorsAppointment.DoctorAppointmentsDate" class="text-danger"></span>
+                <small id="avaliable_appointment_date" class="form-text text-muted" style="color:green; display: none">Такая дата доступна для записи</small>
+                <small id="unavaliable_appointment_date" class="form-text text-muted" style="color:red; display: none">В заданную дату приём не осуществляется, либо всё время записи на данную дату уже занято</small>
+            </div>
+            @if (Model.DoctorsAppointmentss != null)
+            {
+                <div class="form-group">
+                    <span class="glyphicon glyphicon-calendar">&nbsp;</span><label class="control-label">Выбор времени</label><br />
+                    <select asp-for="DoctorsAppointment.DoctorAppointmentsTime" class="form-control id-select">
+                        <option selected="" disabled>--- Выберите время посещения доктора ---</option>
+                        @if (Model.DoctorsAppointmentss.Any(d => d.DoctorAppointmentsExistedFlag && d.CustomerId == null))
+                        {
+                            foreach (var item in Model.DoctorsAppointmentss)
+                            {
+                                int id = item.DoctorAppointmentsId;
+                                string time = item.DoctorAppointmentsTime;
+                                <option value=@time>@time</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="DoctorsAppointment.DoctorAppointmentsTime" class="text-danger"></span>
+                </div>
+            }
+        </div>
+    </div>
+
+
+    @* Уведомление о невозможности создания недостаточно заполненного профиля. *@
+    <div class="alert alert-danger" id="danger_alert" style="display: none;">
+        <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+        <button type="button" class="close" data-dismiss="alert"></button>
+        <strong>Нельзя просто так взять и отправить не полностью заполненный профиль. </strong>
+    </div>
+
+    @* Нижний footer модального окна с кнопками создания и возврата. *@
+    <div class="modal-footer" style="margin-top: 15px;">
+        <input id="button_create" type="submit" value="Добавить посещение" class="btn btn-success" />
+        <button type="button" id="buttonBackToIndexFromCreateOrEdit" class="btn btn-default" data-dismiss="modal" style="display: none">Назад к списку докторов</button>
+        <a asp-action="Index" id="linkBackToIndexFromCreateOrEdit" class="btn btn-default instances-edit-link">Назад к списку докторов</a>
+    </div>
+</form>

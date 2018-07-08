@@ -1,0 +1,107 @@
+﻿@model TestWork.ViewModels.DoctorsViewModel
+@{
+    if (User.IsInRole("Registrator"))
+    {
+        ViewData["Title"] = (Model.Doctor.DoctorsId == 0) ? "Добавление нового доктора" : "Изменение информации доктора";
+        ViewData["SubTitle"] = "Доктор";
+
+        @if (Model.Doctor.DoctorsId == 0)
+        {
+            <p id="instance_for_addition" style="display: none"></p>
+        }
+        else
+        {
+            <p id="instance_for_edition" style="display: none"></p>
+
+        }
+        <p id="controller_name" style="display: none">Doctors</p>
+        <h2 id="instance_header">@ViewData["Title"]</h2>
+
+        <h4>@ViewData["SubTitle"]</h4>
+        <hr />
+        <form asp-action="Create" id="instance_form" data-list-url="@Url.Action("Index")">
+            <div class="row">
+                <div class="col-md-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input type="hidden" asp-for="Doctor.DoctorsId" />
+                    @if (Model.Doctor.DoctorsId != 0)
+                    {
+                        Model.Doctor.DoctorsExistedFlag = true;
+                    }
+
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-user">&nbsp;</span><label asp-for="Doctor.DoctorsName" class="control-label"></label>
+                        <input asp-for="Doctor.DoctorsName" class="form-control instance-name-input" />
+                        <span asp-validation-for="Doctor.DoctorsName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-asterisk">&nbsp;</span><label asp-for="Doctor.DoctorsSpecialization" class="control-label"></label>
+                        <input asp-for="Doctor.DoctorsSpecialization" class="form-control instance-name-input" />
+                        <span asp-validation-for="Doctor.DoctorsSpecialization" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-phone-alt">&nbsp;</span><label asp-for="Doctor.DoctorsPhoneNumber" class="control-label"></label>
+                        <input asp-for="Doctor.DoctorsPhoneNumber" class="form-control instance-name-input" />
+                        <span asp-validation-for="Doctor.DoctorsPhoneNumber" class="text-danger"></span>
+                        <small id="avaliable_instance_name_check" class="form-text text-muted avaliable-instance-name-check" style="color:green; display: none">Такой номер телефона свободен</small>
+                        <small id="unavaliable_instance_name_check" class="form-text text-muted unavaliable-instance-name-check" style="color:red; display: none">Такой номер телефона уже приписан к одному из докторов</small>
+                    </div>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-plus">&nbsp;</span><label class="control-label">Выбор отделения</label><br />
+                        <select asp-for="Doctor.ClinicalDepartmentId" class="form-control id-select">
+                            <option selected="" disabled>--- Выберите отделение ---</option>
+                            @if (Model.ClinicalDepartments != null && Model.ClinicalDepartments.Any(d => d.ClinicalDepartmentExistedFlag))
+                            {
+                                foreach (var item in Model.ClinicalDepartments)
+                                {
+                                    int id = item.ClinicalDepartmentId;
+                                    string name = item.ClinicalDepartmentName;
+                                    <option value=@id>@name</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="Doctor.ClinicalDepartmentId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        @{
+                            if (Model.Doctor.DoctorsId == 0)
+                            {
+                                <span class="glyphicon glyphicon-calendar">&nbsp;</span><label class="control-label">Выбор периода работы доктора &mdash; рабочие дни (с 09:00 до 18:00) за исключением выходных дней - субботы и воскреснья (исключаются системой автоматически)</label><br />
+                            }
+                            else
+                            {
+                                <span class="glyphicon glyphicon-calendar">&nbsp;</span><label class="control-label">Изменение периода работы доктора &mdash; рабочие дни (с 09:00 до 18:00) за исключением выходных дней - субботы и воскреснья (исключаются системой автоматически)</label><br />
+                            }
+                            if (Model.Doctor.DoctorsId != 0 && Model.doctorsStartDate != null && Model.doctorsStopDate != null)
+                            {
+                                <p><i>Текущий период работы доктора &mdash; c @Model.doctorsStartDate по @Model.doctorsStopDate</i></p>
+                            }
+                        }
+                        <label class="control-label">С&nbsp;</label><br />
+                        <input asp-for="doctorsStartDate" class="form-control" />
+                        <span asp-validation-for="doctorsStartDate" class="text-danger"></span>
+                        <br /><label class="control-label">По&nbsp;</label><br />
+                        <input asp-for="doctorsStopDate" class="form-control" />
+                        <span asp-validation-for="doctorsStopDate" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+
+            @* Уведомление о невозможности создания недостаточно заполненного профиля. *@
+            <div class="alert alert-danger" id="danger_alert" style="display: none;">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <button type="button" class="close" data-dismiss="alert"></button>
+                <strong>Нельзя просто так взять и отправить не полностью заполненный профиль. </strong>
+            </div>
+
+            @* Нижний footer модального окна с кнопками создания и возврата. *@
+            <div class="modal-footer" style="margin-top: 15px;">
+                <input id="button_create" type="submit" value="@((Model.Doctor.DoctorsId == 0) ? "Добавить" : "Применить изменения")" class="btn btn-success" />
+                <button type="button" id="buttonBackToIndexFromCreateOrEdit" class="btn btn-default" data-dismiss="modal" style="display: none">Назад к списку докторов</button>
+                <a asp-action="Index" id="linkBackToIndexFromCreateOrEdit" class="btn btn-default instances-edit-link">Назад к списку докторов</a>
+            </div>
+        </form>
+    }
+}

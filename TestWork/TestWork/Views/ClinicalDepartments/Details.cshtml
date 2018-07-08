@@ -1,0 +1,60 @@
+﻿@model TestWork.ViewModels.ClinicalDepartmentDetailsDeleteViewModel;
+
+@{
+    if (Model.clinicalDepartmentOperationFlag == "Details")
+    {
+        ViewData["Title"] = "Детали профиля";
+    }
+    if (Model.clinicalDepartmentOperationFlag == "Delete")
+    {
+        ViewData["Title"] = "Удаление профиля";
+    }
+}
+
+<div id="details_delete_instance_form" style="margin-top: auto">
+    <div>
+        <h2 id="delete_details_header">@ViewData["Title"]</h2>
+        <h4>Отделение</h4>
+        <hr />
+        <dl id="details_delete_instance_form_dl" class="dl-horizontal" style=" grid-template-columns: max-content">
+            <dt title="@Html.DisplayNameFor(model => (new ClinicalDepartment()).ClinicalDepartmentName)">
+                @Html.DisplayNameFor(model => (new ClinicalDepartment()).ClinicalDepartmentName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.ClinicalDepartment.ClinicalDepartmentName)
+            </dd>
+        </dl>
+        @{
+        if (Model.clinicalDepartmentOperationFlag == "Details")
+        {
+            <h4>Доктора в данном отделении</h4>
+            <hr />
+                if (Model.ClinicalDepartment.Doctors != null && Model.ClinicalDepartment.Doctors.Any(d => d.DoctorsExistedFlag))
+                {
+                    <ul>
+                        @for (int i = 0; i < Model.ClinicalDepartment.Doctors.Count(); i++)
+                        {
+                            if (Model.ClinicalDepartment.Doctors[i].DoctorsExistedFlag)
+                            {
+                                <li>@Html.DisplayFor(model => model.ClinicalDepartment.Doctors[i].DoctorsName) &nbsp; &mdash; &nbsp; @Html.DisplayFor(model => model.ClinicalDepartment.Doctors[i].DoctorsSpecialization)</li>
+                            }
+                        }
+                    </ul>
+                }
+            }
+        }
+    </div>
+    @* Нижний footer модального окна с кнопками создания и возврата. *@
+    <div class="modal-footer" style="margin-top: 15px;">
+        @if (Model.clinicalDepartmentOperationFlag == "Details" && User.IsInRole("Registrator"))
+        {
+            <a asp-action="Create" asp-route-id="@Model.ClinicalDepartment.ClinicalDepartmentId" class="btn btn-success instances-edit-from-details">Правка</a>
+        }
+        @if (Model.clinicalDepartmentOperationFlag == "Delete" && User.IsInRole("Registrator"))
+        {
+            <a asp-action="Delete" asp-route-id="@Model.ClinicalDepartment.ClinicalDepartmentId" class="btn btn-danger instance-delete-it">Удаление</a>
+        }
+        <button type="button" id="button_back_to_index_from_details_or_delete" class="btn btn-default" data-dismiss="modal" style="display: none">Назад к списку отделений</button>
+        <a asp-action="Index" id="link_back_to_index_from_details_or_delete" class="btn btn-default instances-edit-link">Назад к списку отделений</a>
+    </div>
+</div>

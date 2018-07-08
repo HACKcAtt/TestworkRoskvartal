@@ -1,0 +1,59 @@
+﻿@model TestWork.Models.ClinicalDepartment
+@{
+    if (User.IsInRole("Registrator"))
+    {
+        ViewData["Title"] = (Model.ClinicalDepartmentId == 0) ? "Добавление нового отделения" : "Изменение информации отделения";
+        ViewData["SubTitle"] = "Отделение";
+
+        @if (Model.ClinicalDepartmentId == 0)
+        {
+            <p id="instance_for_addition" style="display: none"></p>
+        }
+        else
+        {
+            <p id="instance_for_edition" style="display: none"></p>
+
+        }
+        <p id="controller_name" style="display: none">ClinicalDepartments</p>
+        <h2 id="instance_header">@ViewData["Title"]</h2>
+
+        <h4>Отделение</h4>
+        <hr />
+        <form asp-action="Create" id="instance_form" data-list-url="@Url.Action("Index")">
+            <div class="row">
+                <div class="col-md-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input type="hidden" asp-for="ClinicalDepartmentId" />
+                    @if (Model.ClinicalDepartmentId != 0)
+                    {
+                        Model.ClinicalDepartmentExistedFlag = true;
+                    }
+
+                    <div class="form-group">
+                        <label asp-for="ClinicalDepartmentName" class="control-label"></label>
+                        <input asp-for="ClinicalDepartmentName" class="form-control instance-name-input" />
+                        <span asp-validation-for="ClinicalDepartmentName" class="text-danger"></span>
+                        <small id="avaliable_instance_name_check" class="form-text text-muted avaliable-instance-name-check" style="color:green; display: none">Такое отделение ещё не добавлено</small>
+                        <small id="unavaliable_instance_name_check" class="form-text text-muted unavaliable-instance-name-check" style="color:red; display: none">Такое отделение уже существует</small>
+                    </div>
+                </div>
+            </div>
+
+
+            @* Уведомление о невозможности создания недостаточно заполненного профиля. *@
+            <div class="alert alert-danger" id="danger_alert" style="display: none;">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <button type="button" class="close" data-dismiss="alert"></button>
+                <strong>Нельзя просто так взять и отправить не полностью заполненный профиль. </strong>
+            </div>
+
+            @* Нижний footer модального окна с кнопками создания и возврата. *@
+            <div class="modal-footer" style="margin-top: 15px;">
+                <input id="button_create" type="submit" value="@((Model.ClinicalDepartmentId == 0) ? "Добавить" : "Применить изменения")" class="btn btn-success" />
+                <button type="button" id="buttonBackToIndexFromCreateOrEdit" class="btn btn-default" data-dismiss="modal" style="display: none">Назад к списку отделений</button>
+                <a asp-action="Index" id="linkBackToIndexFromCreateOrEdit" class="btn btn-default instances-edit-link">Назад к списку отделений</a>
+            </div>
+        </form>
+    }
+}

@@ -1,0 +1,52 @@
+﻿@model TestWork.ViewModels.RegisterViewModel
+
+<h2>Регистрация</h2>
+<hr />
+<p id="controller_name" style="display: none">Account</p>
+<form asp-action="Register" asp-controller="Account" asp-anti-forgery="true">
+    <div class="validation" asp-validation-summary="ModelOnly" />
+    <div id="register_form" class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Users.UsersName">Введите ФИО</label><br />
+                <input asp-for="Users.UsersName" class="form-control" />
+                <span asp-validation-for="Users.UsersName" />
+            </div>
+                <div class="form-group">                    
+                    <label asp-for="Users.UsersEmail" >Введите Email</label><br />
+                    <input asp-for="Users.UsersEmail" class="form-control instance-email-input"/>
+                    <span asp-validation-for="Users.UsersEmail" />                    
+                 </div>
+                <small id="avaliable_instance_email_check" class="form-text text-muted avaliable_instance_email_check" style="color:green; display: none">Такой адрес электронной почты свободен</small>
+                <small id="unavaliable_instance_email_check" class="form-text text-muted unavaliable_instance_email_check" style="color:red; display: none">Такой адрес электронной почты уже занят</small>
+                <div class="form-group">
+                    <label asp-for="Users.UsersPhoneNumber">Введите телефонный номер</label><br />
+                    <input asp-for="Users.UsersPhoneNumber" class="form-control instance-name-input" />
+                    <span asp-validation-for="Users.UsersPhoneNumber" />
+                    <small id="avaliable_instance_name_check" class="form-text text-muted avaliable-instance-name-check" style="color:green; display: none">Такой номер телефона свободен</small>
+                    <small id="unavaliable_instance_name_check" class="form-text text-muted unavaliable-instance-name-check" style="color:red; display: none">Такой номер телефона уже приписан к одному из пациентов</small>
+                </div>
+                <small id="avaliable_instance_name_check" class="form-text text-muted avaliable-instance-name-check" style="color:green; display: none">Такой номер телефона свободен</small>
+                <small id="unavaliable_instance_name_check" class="form-text text-muted unavaliable-instance-name-check" style="color:red; display: none">Такой номер телефона уже приписан к одному из пациентов</small>
+                <div class="form-group">
+                    <label asp-for="Users.UsersAddress">Введите адрес проживания</label><br />
+                    <input asp-for="Users.UsersAddress" class="form-control" />
+                    <span asp-validation-for="Users.UsersAddress" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="UsersPassword">Введите пароль</label><br />
+                    <input asp-for="UsersPassword" class="form-control" />
+                    <span asp-validation-for="Users.UsersPassword" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword">Повторите пароль</label><br />
+                    <input asp-for="ConfirmPassword" class="form-control" />
+                    <span asp-validation-for="ConfirmPassword" />
+                </div>
+                <br />
+                <div>
+                    <input id="button_create" type="submit" class="btn btn-success" value="Регистрация" />
+                </div>
+                </div>
+            </div>
+</form>

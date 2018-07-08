@@ -1,0 +1,134 @@
+﻿@using System.Security.Claims;
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - TestWork</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/css/site.css" />
+        <link rel="stylesheet" href="~/css/loadme.min.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+    </environment>
+</head>
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">TestWork</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Главная страница</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="About">Информация</a></li>
+                    <li><a asp-area="" asp-controller="Home" asp-action="Contact">Контакты</a></li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        int loggedInUserId;
+                        Claim user = User.FindFirst(c => c.Type == ClaimTypes.SerialNumber);
+                        string userValue = user.Value;
+                        Int32.TryParse(userValue, out loggedInUserId);
+                        if (!User.IsInRole("Registrator"))
+                        {
+                            <li><a href='@Url.Action("Create", "Customers", new { id = loggedInUserId}, null)'><i class="glyphicon glyphicon-cog"></i>&nbsp;Правка профиля&nbsp;</a></li>
+                        }
+                        <li><a asp-area="" asp-controller="Account" asp-action="Logout"><i class="glyphicon glyphicon-log-out"></i>&nbsp;Выход&nbsp;</a></li>
+                    }
+                    else
+                    {
+                        <li><a asp-area="" asp-controller="Account" asp-action="Login"><i class="glyphicon glyphicon-log-in"></i>&nbsp;Вход/регистрация</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container body-content">
+        @* Различные alert-сообщения. *@
+        <div id="successfull_addition" class="alert alert-success" role="alert" style="display: none; margin-top: 30px;">Профиль успешно добавлен</div>
+        <div id="successfull_edition" class="alert alert-success" role="alert" style="display: none; margin-top: 30px;">Профиль успешно отредактирован</div>
+        <div id="successfull_deleting" class="alert alert-warning" role="alert" style="display: none; margin-top: 30px;">Профиль успешно удалён</div>
+        <div id="unsuccessfull_searching" class="alert alert-info" role="alert" style="display: none; margin-top: 30px;">К сожалению, по данному запросу нчиего не найдено</div>
+        <div id="empty_searchstring" class="alert alert-warning" role="alert" style="display: none; margin-top: 30px;">Вы ввели пустую поисковую строку. Пожалуйста, попробуйте ещё раз, если желаете, конечно</div>
+
+        @* Кружочек, демонстрируемый во время загрузки. *@
+        <div class="loader" style="display:none;">
+            <div class="loadme-circlePoint">
+                <div class="loadme-circlePoint1 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint2 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint3 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint4 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint5 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint6 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint7 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint8 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint9 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint10 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint11 loadme-circlePoint-child"></div>
+                <div class="loadme-circlePoint12 loadme-circlePoint-child"></div>
+            </div>
+            <div class="loadme-mask"></div>
+        </div>
+
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; 2018 - TestWork</p>
+        </footer>
+    </div>
+
+    @* Отрисовка модального окна по нажатию на ссылку создания нового профиля отделения происходит здесь. *@
+    <div id="modal_create_instance" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div id="modal_create_instance_content" class="modal-content">
+            </div>
+        </div>
+    </div>
+
+    @* Отрисовка модального окна по нажатию на ссылку деталей отделения происходит здесь. *@
+    <div id="modal_details_instance" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div id="modal_details_content_instance" class="modal-content">
+            </div>
+        </div>
+    </div>
+
+
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+
+    @RenderSection("Scripts", required: false)
+    @{Html.RenderPartial("_ValidationScriptsPartial");}
+</body>
+</html>

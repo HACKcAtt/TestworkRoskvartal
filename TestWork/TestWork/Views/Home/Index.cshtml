@@ -1,0 +1,35 @@
+﻿@using System.Security.Claims;
+@{
+    ViewData["Title"] = "Веб-приложение РЕГИСТРАТУРА - домашняя страница";
+}
+
+<h3>Данное веб-приложение является тестовым и демонстрирует работу информационной системы регистратуры в поликлинике</h3>
+<hr />
+@if (User.Identity.IsAuthenticated)
+{
+    <div>
+        <ul>
+            <li type="circle">
+                <a href="@Url.Action("Index", "ClinicalDepartments")" class="elements">
+                    <span>К списку отделений</span>
+                    <br />
+                </a>
+            </li>
+            <li type="circle">
+                <a href="@Url.Action("Index", "Doctors")" class="elements">
+                    <span>К списку докторов</span>
+                    <br />
+                </a>
+            </li>
+            @if (User.IsInRole("Registrator"))
+            {
+                <li type="circle">
+                    <a href="@Url.Action("Index", "Customers")" class="elements">
+                        <span>К списку профилей пациентов</span>
+                        <br />
+                    </a>
+                </li>
+            }
+        </ul>
+    </div>
+}

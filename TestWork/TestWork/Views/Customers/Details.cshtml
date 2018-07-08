@@ -1,0 +1,126 @@
+﻿@model TestWork.ViewModels.CustomersViewModel;
+@using System.Security.Claims;
+
+<style>
+    p.class-hover {
+        color: #3a71b9;
+        text-decoration: none;
+    }
+
+        p.class-hover:hover {
+            color: #3a71b9;
+            text-decoration: underline;
+        }
+</style>
+
+@{
+    // Проверка, если пользователь обратился к правке своего аккаунта.
+    int loggedInUserId;
+    Claim user = User.FindFirst(c => c.Type == ClaimTypes.SerialNumber);
+    string userValue = user.Value;
+    Int32.TryParse(userValue, out loggedInUserId);
+    bool falgOfUserMatching = false;
+    if (Model.Customers.CustomerId != 0 && Model.Customers.CustomerId == loggedInUserId)
+    {
+        falgOfUserMatching = true;
+    }
+
+    if (falgOfUserMatching || User.IsInRole("Registrator"))
+    {
+
+        if (Model.customersOperationFlag == "Details")
+        {
+            ViewData["Title"] = "Детали профиля";
+        }
+        if (Model.customersOperationFlag == "Delete")
+        {
+            ViewData["Title"] = "Удаление профиля";
+        }
+
+        <div id="details_delete_instance_form" style="margin-top: auto">
+            <div>
+                <h2 id="delete_details_header">@ViewData["Title"]</h2>
+                <h4>@ViewData["SubTitle"]</h4>
+                <hr />
+                <dl id="details_delete_instance_form_dl" class="dl-horizontal" style=" grid-template-columns: max-content">
+                    <dt title="@Html.DisplayNameFor(model => (new Customer()).Users.UsersName)">
+                        @Html.DisplayNameFor(model => (new Customer()).Users.UsersName)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Customers.Users.UsersName)
+                    </dd>
+                    <dt title="@Html.DisplayNameFor(model => (new Customer()).Users.UsersBirthday)">
+                        @Html.DisplayNameFor(model => (new Customer()).Users.UsersBirthday)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Customers.Users.UsersBirthday)
+                    </dd>
+                    <dt title="@Html.DisplayNameFor(model => (new Customer()).Users.UsersPhoneNumber)">
+                        @Html.DisplayNameFor(model => (new Customer()).Users.UsersPhoneNumber)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Customers.Users.UsersPhoneNumber)
+                    </dd>
+                    <dt title="@Html.DisplayNameFor(model => (new Customer()).Users.UsersEmail)">
+                        @Html.DisplayNameFor(model => (new Customer()).Users.UsersEmail)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Customers.Users.UsersEmail)
+                    </dd>
+                    <dt title="@Html.DisplayNameFor(model => (new Customer()).Users.UsersAddress)">
+                        @Html.DisplayNameFor(model => (new Customer()).Users.UsersAddress)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.Customers.Users.UsersAddress)
+                    </dd>
+                    <dt title="@Html.DisplayNameFor(model => (new Customer()).CustomerNotes)">
+                        @Html.DisplayNameFor(model => (new Customer()).CustomerNotes)
+                    </dt>
+                    <dd style="word-wrap:break-word">
+                        @Html.DisplayFor(model => model.Customers.CustomerNotes)
+                    </dd>
+                </dl>
+            </div>
+            <hr />
+            <p class="class-hover" id="show_block"><span class="glyphicon glyphicon-collapse-down">&nbsp;</span>Показать список приёмов у врачей</p>
+            <p class="class-hover" id="hide_block" style="display:none"><span class="glyphicon glyphicon-collapse-up">&nbsp;</span>Скрыть список приёмов у врачей</p>
+            <div id="show_hide_block" style="display:none">
+                @{
+                    if (Model.customersOperationFlag == "Details")
+                    {
+                        if (Model.Customers.DoctorsAppointments != null && Model.Customers.DoctorsAppointments.Any(d => d.DoctorAppointmentsExistedFlag))
+                        {
+                            <ul>
+                                @for (int i = 0; i < Model.Customers.DoctorsAppointments.Count(); i++)
+                                {
+                                    if (Model.Customers.DoctorsAppointments[i].DoctorAppointmentsExistedFlag)
+                                    {
+                                        <li>@Html.DisplayFor(model => model.Customers.DoctorsAppointments[i].DoctorAppointmentsDate) &nbsp; @Html.DisplayFor(model => model.Customers.DoctorsAppointments[i].DoctorAppointmentsTime); &nbsp; <a href='@Url.Action("Details", "Doctors", new { id = Model.Customers.DoctorsAppointments[i].DoctorsId }, null)'>@Html.DisplayFor(model => model.Customers.DoctorsAppointments[i].Doctors.DoctorsName)</a> &nbsp; &mdash; &nbsp; @Html.DisplayFor(model => model.Customers.DoctorsAppointments[i].Doctors.DoctorsSpecialization)</li>
+                                    }
+                                }
+                            </ul>
+                        }
+                    }
+                }
+            </div>
+
+            @* Нижний footer модального окна с кнопками создания и возврата. *@
+            <div class="modal-footer" style="margin-top: 15px;">
+                @if (Model.customersOperationFlag == "Details")
+                {
+                    <a asp-action="Create" asp-route-id="@Model.Customers.CustomerId" class="btn btn-success instances-edit-from-details">Правка</a>
+                    if (User.IsInRole("Registrator"))
+                    {
+                        <a href='@Url.Action("Index", "CustomersIllnesses", new { customerIdd = Model.Customers.CustomerId }, null)' class="btn btn-primary">Перейти к карточке пациента</a>
+                    }
+                }
+                @if (Model.customersOperationFlag == "Delete" && User.IsInRole("Registrator"))
+                {
+                    <a asp-action="Delete" asp-route-id="@Model.Customers.CustomerId" class="btn btn-danger instance-delete-it">Удаление</a>
+                }
+                <button type="button" id="button_back_to_index_from_details_or_delete" class="btn btn-default" data-dismiss="modal" style="display: none">Назад</button>
+                <a asp-action="Index" id="link_back_to_index_from_details_or_delete" class="btn btn-default instances-edit-link">Назад</a>
+            </div>
+        </div>
+    }
+}

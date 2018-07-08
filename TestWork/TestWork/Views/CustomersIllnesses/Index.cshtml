@@ -1,0 +1,59 @@
+﻿@model IEnumerable<TestWork.Models.CustomersIllnesses>
+
+@{
+    if (User.IsInRole("Registrator"))
+    {
+        ViewData["Title"] = "Карточка пациента";
+        ViewData["TitleCustomer"] = ViewBag.CustomerName;
+        ViewData["SubTitleCustomer"] = ViewBag.CustomerBirthday;
+
+        <h2>@ViewData["Title"]</h2>
+        <hr />
+        <h2>@ViewData["TitleCustomer"]</h2>
+        <h4>@ViewData["SubTitleCustomer"]</h4>
+        <hr />
+        <div class="page" style="display: none"></div>
+
+        <p>
+            @{ 
+                int customerIdd = ViewBag.CustomerId;
+            }
+            <a asp-action="Create" asp-route-customerIdd="@customerIdd" id="create_instance">Добавить новую запись в карточке</a>
+        </p>
+
+        <div class="row">
+            <div class="col-md-4">
+                <p><i>Поиск заболевания по названию:</i></p>
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" id="instance_search_button" type="submit" data-href="@Url.Action("Index")" data-ajax="@Url.Action("GetCustomersIllnessesTable")"><span class="glyphicon glyphicon-search"></span></button>
+                    </span>
+                    <input type="text" name="searchString" id="instance_search_input_field" class="form-control" placeholder="Искать...">
+                </div>
+            </div>
+        </div>
+
+        @* Отрисовка секции с таблицей.*@
+        <div id="instances_list" data-url="@Url.Action("GetCustomersIllnessesTable")">
+            @Html.Partial("GetCustomersIllnessesTable", Model)
+        </div>
+        @* Меню выбора количества профилей для отрисовки на одной странице. *@
+        <div id="instances_per_page_choosing_menu">
+            <table>
+                <tr>
+                    <td valign="bottom"><p><nobr>Выберите количество записей для отображения на странице:&nbsp;</nobr></p></td>
+                    <td>
+                        <select class="form-control instances-per-page-for-display col-lg-3" style="width: 70px">
+                            <option selected="" disabled>--- Выберите количество записей для отображения на странице ---</option>
+                            <option selected value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="All">Все</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    }
+}

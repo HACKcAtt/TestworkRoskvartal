@@ -1,0 +1,105 @@
+﻿@model TestWork.ViewModels.CustomersViewModel
+@using System.Security.Claims;
+
+@{
+    // Проверка, если пользователь обратился к правке своего аккаунта.
+    int loggedInUserId;
+    Claim user = User.FindFirst(c => c.Type == ClaimTypes.SerialNumber);
+    string userValue = user.Value;
+    Int32.TryParse(userValue, out loggedInUserId);
+    bool falgOfUserMatching = false;
+    if (Model.Customers.CustomerId != 0 && Model.Customers.CustomerId == loggedInUserId && !User.IsInRole("Registrator"))
+    {
+        falgOfUserMatching = true;
+    }
+
+    if (falgOfUserMatching || User.IsInRole("Registrator"))
+    {
+        ViewData["Title"] = (Model.Customers.CustomerId == 0) ? "Добавление нового пациента" : "Изменение информации пациента";
+        ViewData["SubTitle"] = "Пациент";
+
+        @if (Model.Customers.CustomerId == 0)
+        {
+            <p id="instance_for_addition" style="display: none"></p>
+        }
+        else
+        {
+            <p id="instance_for_edition" style="display: none"></p>
+
+        }
+        <p id="controller_name" style="display: none">Customers</p>
+        <h2 id="instance_header">@ViewData["Title"]</h2>
+
+        <h4>@ViewData["SubTitle"]</h4>
+        <hr />
+        <form asp-action="Create" id="instance_form" data-list-url="@Url.Action("Index")">
+            <div class="row">
+                <div class="col-md-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input type="hidden" asp-for="Customers.CustomerId" />
+                    <input type="hidden" asp-for="Customers.UsersId" />
+                    @if (Model.Customers.CustomerId != 0)
+                    {
+                        Model.Customers.CustomerExistedFlag = true;
+                    }
+
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-user">&nbsp;</span><label asp-for="Customers.Users.UsersName" class="control-label"></label>
+                        <input asp-for="Customers.Users.UsersName" class="form-control" />
+                        <span asp-validation-for="Customers.Users.UsersName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-gift">&nbsp;</span><label asp-for="Customers.Users.UsersBirthday" class="control-label"></label>
+                        <input asp-for="Customers.Users.UsersBirthday" class="form-control" />
+                        <span asp-validation-for="Customers.Users.UsersBirthday" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-earphone">&nbsp;</span><label asp-for="Customers.Users.UsersPhoneNumber" class="control-label"></label>
+                        <input asp-for="Customers.Users.UsersPhoneNumber" class="form-control instance-name-input" />
+                        <span asp-validation-for="Customers.Users.UsersPhoneNumber" class="text-danger"></span>
+                    </div>
+                    <small id="avaliable_instance_name_check" class="form-text text-muted avaliable-instance-name-check" style="color:green; display: none">Такой номер телефона свободен</small>
+                    <small id="unavaliable_instance_name_check" class="form-text text-muted unavaliable-instance-name-check" style="color:red; display: none">Такой номер телефона уже приписан к одному из пациентов</small>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-envelope">&nbsp;</span><label asp-for="Customers.Users.UsersEmail" class="control-label"></label>
+                        <input asp-for="Customers.Users.UsersEmail" class="form-control instance-email-input" />
+                        <span asp-validation-for="Customers.Users.UsersEmail" class="text-danger"></span>
+                    </div>
+                    <small id="avaliable_instance_email_check" class="form-text text-muted avaliable_instance_email_check" style="color:green; display: none">Такой адрес электронной почты свободен</small>
+                    <small id="unavaliable_instance_email_check" class="form-text text-muted unavaliable_instance_email_check" style="color:red; display: none">Такой адрес электронной почты уже занят</small>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-lock">&nbsp;</span><label asp-for="Customers.Users.UsersPassword" class="control-label"></label>
+                        <input asp-for="Customers.Users.UsersPassword" class="form-control" />
+                        <span asp-validation-for="Customers.Users.UsersPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-home">&nbsp;</span><label asp-for="Customers.Users.UsersAddress" class="control-label"></label>
+                        <input asp-for="Customers.Users.UsersAddress" class="form-control" />
+                        <span asp-validation-for="Customers.Users.UsersAddress" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-pencil">&nbsp;</span><label asp-for="Customers.CustomerNotes" class="control-label"></label>
+                        <textarea asp-for="Customers.CustomerNotes" class="form-control" id="customer_notes"></textarea>
+                        <span asp-validation-for="Customers.CustomerNotes" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+
+            @* Уведомление о невозможности создания недостаточно заполненного профиля. *@
+            <div class="alert alert-danger" id="danger_alert" style="display: none;">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <button type="button" class="close" data-dismiss="alert"></button>
+                <strong>Нельзя просто так взять и отправить не полностью заполненный профиль. </strong>
+            </div>
+
+            @* Нижний footer модального окна с кнопками создания и возврата. *@
+            <div class="modal-footer" style="margin-top: 15px;">
+                <input id="button_create" type="submit" value="@((Model.Customers.CustomerId == 0) ? "Добавить" : "Применить изменения")" class="btn btn-success" />
+                <button type="button" id="buttonBackToIndexFromCreateOrEdit" class="btn btn-default" data-dismiss="modal" style="display: none">Назад</button>
+                <a asp-action="Index" id="linkBackToIndexFromCreateOrEdit" class="btn btn-default instances-edit-link">Назад</a>
+            </div>
+        </form>
+    }
+}

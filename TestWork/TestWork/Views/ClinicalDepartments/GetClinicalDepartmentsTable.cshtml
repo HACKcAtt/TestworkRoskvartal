@@ -1,0 +1,92 @@
+﻿@model PaginatedList<TestWork.Models.ClinicalDepartment>
+<style>
+    p.class-hover {
+        color: #3a71b9;
+        text-decoration: none;
+    }
+
+        p.class-hover:hover {
+            color: #3a71b9;
+            text-decoration: underline;
+        }
+</style>
+<div class="instance-table-item">
+    @* Заголовочный раздел таблицы. *@
+    <table class="table" id="coloumn_names">
+        <thead>
+            <tr>
+                @* Подпись колонки с именами. *@
+                <th id="name_th" style="vertical-align: top">
+                    @{
+                        string name = Html.DisplayNameFor(model => (new ClinicalDepartment()).ClinicalDepartmentName);
+                    }
+                    <p class="class-hover" data-href='@Url.Action("GetClinicalDepartmentsTable", "ClinicalDepartments", new {page = Model.PageIndex, searchString = Model.searchQuery, sortOrder = ViewBag.NameSortParm }, null)'>@name</p>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @* Заполнение таблицы. *@
+            @if (Model != null)
+            {
+                @foreach (var item in Model)
+                {
+                    @* Нельзя обращаться к несуществующему элементу (выйдет ошибка при отрисовке страницы), поэтому необходима проверка на существование. *@
+                    @if ((item != null) && (item.ClinicalDepartmentExistedFlag))
+                    {
+                        <tr>
+                            @* Колонка с именем. *@
+                            <td>
+                                
+                                
+                                @Html.DisplayFor(modelItem => item.ClinicalDepartmentName)
+                            </td>
+                            <td>
+                                @if (User.IsInRole("Registrator"))
+                                {
+                                    <a asp-action="Create" asp-route-id="@item.ClinicalDepartmentId" class="instances-edit">Правка |</a>
+                                }
+                                <a asp-action="Details" asp-route-id="@item.ClinicalDepartmentId" class="instance-details">Детали</a> |
+                                @if (User.IsInRole("Registrator"))
+                                {
+                                    <a asp-action="Delete" asp-route-id="@item.ClinicalDepartmentId" class="instance-delete">Удаление</a>
+                                }
+                            </td>
+                        </tr>
+                     }
+                 }
+            }
+        </tbody>
+    </table>
+</div>
+
+@* Реализация пагинации (постраничного вывода). Проверка наличия предыдущей и следующей страницы, чтобы в случае отсутствия делать соответствующую кнопку перехода недоступной. *@
+@{
+    var prevDisabled = Model.HasPreviousPage ? "" : "disabled";
+    var nextDisabled = Model.HasNextPage ? "" : "disabled";
+}
+
+@* Реализация пагинации (постраничного вывода). Список со стрелками перехода к первой и последней странице и номерами страниц между ними. *@
+<ul class="pagination">
+    @* Ссылка перехода к первой странице. *@
+    <li><a asp-action="Index" asp-route-page="1" asp-route-searchString="@Model.searchQuery" data-pagination-link="@Url.Action("GetClinicalDepartmentsTable", new { page = 1, searchString = Model.searchQuery, sortOrder = ViewBag.CurrentSort})" class="btn btn-default @prevDisabled">&lt;&lt;</a></li>
+    @* Ссылка на одну предыдущую по отношению к текущей странице страницу. *@
+    @if (Model.HasPreviousPage == true)
+    {
+        <li><a asp-action="Index" asp-route-page="@(Model.PageIndex - 1)" asp-route-searchString="@Model.searchQuery" data-pagination-link="@Url.Action("GetClinicalDepartmentsTable", new { page = (Model.PageIndex - 1), searchString = Model.searchQuery, sortOrder = ViewBag.CurrentSort })">@(Model.PageIndex - 1)</a></li>
+    }
+    @* Ссылка на текущую и две следующих страницы. *@
+    <li class="active"><a asp-action="Index" asp-route-page="@(Model.PageIndex)" asp-route-searchString="@Model.searchQuery" data-pagination-link="@Url.Action("GetClinicalDepartmentsTable", new { page = Model.PageIndex, searchString = Model.searchQuery, sortOrder = ViewBag.CurrentSort })">@(Model.PageIndex)</a></li>
+
+    @for (int i = (Model.PageIndex + 1); i <= ((Model.TotalPages - Model.PageIndex > 2) ? (2 + Model.PageIndex) : (Model.TotalPages)); i++)
+    {
+
+        <li><a asp-action="Index" asp-route-page="@i" asp-route-searchString="@Model.searchQuery" data-pagination-link="@Url.Action("GetClinicalDepartmentsTable", new { page = i })">@i</a></li>
+
+    }
+    @* Переход к последней странице. *@
+    <li><a asp-action="Index" asp-route-page="@Model.TotalPages" asp-route-searchString="@Model.searchQuery" class="btn btn-default @nextDisabled" data-pagination-link="@Url.Action("GetClinicalDepartmentsTable", new { page = Model.TotalPages, searchString = Model.searchQuery, sortOrder = ViewBag.CurrentSort })">&gt;&gt;</a></li>
+</ul>
+
+@section scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

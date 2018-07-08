@@ -1,0 +1,56 @@
+﻿@model IEnumerable<TestWork.Models.Doctors>
+
+@{
+    ViewData["Title"] = "Доктора";
+}
+
+<h2>@ViewData["Title"]</h2>
+<div class="page" style="display: none"></div>
+
+<p>
+    @{
+        if (User.IsInRole("Registrator"))
+        {
+            <a asp-action="Create" id="create_instance">Добавить нового доктора</a>
+        }
+    }
+</p>
+
+<div class="row">
+    <div class="col-md-4">
+        <p><i>Поиск доктора по имени:</i></p>
+        <div class="input-group">
+            <span class="input-group-btn">
+                <button class="btn btn-default" id="instance_search_button" type="submit" data-href="@Url.Action("Index")" data-ajax="@Url.Action("GetDoctorsTable")"><span class="glyphicon glyphicon-search"></span></button>
+            </span>
+            <input type="text" name="searchString" id="instance_search_input_field" class="form-control" placeholder="Искать...">
+        </div>
+    </div>
+</div>
+
+@* Отрисовка секции с таблицей.*@
+<div id="instances_list" data-url="@Url.Action("GetDoctorsTable")">
+    @Html.Partial("GetDoctorsTable", Model)
+</div>
+@* Меню выбора количества профилей для отрисовки на одной странице. *@
+<div id="instances_per_page_choosing_menu">
+    <table>
+        <tr>
+            <td valign="bottom"><p><nobr>Выберите количество докторов для отображения на странице:&nbsp;</nobr></p></td>
+            <td>
+                <select class="form-control instances-per-page-for-display col-lg-3" style="width: 70px">
+                    <option selected="" disabled>--- Выберите количество докторов для отображения на странице ---</option>
+                    <option selected value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="All">Все</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+</div>
+
+@section scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

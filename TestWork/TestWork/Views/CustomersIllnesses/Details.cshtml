@@ -1,0 +1,77 @@
+﻿@model TestWork.ViewModels.CustomersIllnesesViewModel;
+
+<style>
+    p.class-hover {
+        color: #3a71b9;
+        text-decoration: none;
+    }
+
+        p.class-hover:hover {
+            color: #3a71b9;
+            text-decoration: underline;
+        }
+</style>
+
+@{
+    if (User.IsInRole("Registrator"))
+    {
+        ViewData["Title"] = "Детальная информация о записи в карточке";
+        ViewData["TitleCustomer"] = Model.CustomersIllness.Customer.Users.UsersName;
+        ViewData["SubTitleCustomer"] = Model.CustomersIllness.Customer.Users.UsersBirthday;
+        ViewData["SubTitle"] = "Запись";
+        if (Model.customersOperationFlag == "Details")
+        {
+            ViewData["Title"] = "Детали записи";
+        }
+        if (Model.customersOperationFlag == "Delete")
+        {
+            ViewData["Title"] = "Удаление записи";
+        }
+
+        <div id="details_delete_instance_form" style="margin-top: auto">
+            <div>
+                <h2 id="delete_details_header">@ViewData["Title"]</h2>
+                <hr />
+                <h2>@ViewData["TitleCustomer"]</h2>
+                <h4>@ViewData["SubTitleCustomer"]</h4>
+                <hr />
+                <h4>@ViewData["SubTitle"]</h4>
+                <hr />
+                <dl id="details_delete_instance_form_dl" class="dl-horizontal" style=" grid-template-columns: max-content">
+                    <dt title="@Html.DisplayNameFor(model => (new CustomersIllnesses()).CustomersIllnessesName)">
+                        @Html.DisplayNameFor(model => (new CustomersIllnesses()).CustomersIllnessesName)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.CustomersIllness.CustomersIllnessesName)
+                    </dd>
+                    <dt title="@Html.DisplayNameFor(model => (new CustomersIllnesses()).CustomersIllnessesDateTimeOfAddition)">
+                        @Html.DisplayNameFor(model => (new CustomersIllnesses()).CustomersIllnessesDateTimeOfAddition)
+                    </dt>
+                    <dd>
+                        @Html.DisplayFor(model => model.CustomersIllness.CustomersIllnessesDateTimeOfAddition)
+                    </dd>
+                    <dt title="@Html.DisplayNameFor(model => (new CustomersIllnesses()).CustomersIllnessesDescription)">
+                        @Html.DisplayNameFor(model => (new CustomersIllnesses()).CustomersIllnessesDescription)
+                    </dt>
+                    <dd style="word-wrap:break-word">
+                        @Html.DisplayFor(model => model.CustomersIllness.CustomersIllnessesDescription)
+                    </dd>
+                </dl>
+            </div>
+
+            @* Нижний footer модального окна с кнопками создания и возврата. *@
+            <div class="modal-footer" style="margin-top: 15px;">
+                @if (Model.customersOperationFlag == "Details")
+                {
+                    <a asp-action="Create" asp-route-id="@Model.CustomersIllness.CustomersIllnessesId" asp-route-customerIdd="@Model.CustomersIllness.CustomerId" class="btn btn-success instances-edit-from-details">Правка</a>
+                }
+                @if (Model.customersOperationFlag == "Delete")
+                {
+                    <a asp-action="Delete" asp-route-id="@Model.CustomersIllness.CustomersIllnessesId" asp-route-customerIdd="@Model.CustomersIllness.CustomerId" class="btn btn-danger instance-delete-it">Удаление</a>
+                }
+                <button type="button" id="button_back_to_index_from_details_or_delete" class="btn btn-default" data-dismiss="modal" style="display: none">Назад</button>
+                <a asp-action="Index" id="link_back_to_index_from_details_or_delete" class="btn btn-default instances-edit-link">Назад</a>
+            </div>
+        </div>
+    }
+}

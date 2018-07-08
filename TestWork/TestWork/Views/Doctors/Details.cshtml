@@ -1,0 +1,64 @@
+﻿@model TestWork.ViewModels.DoctorsViewModel;
+
+@{
+    ViewData["Title"] = "Детальная информация";
+    ViewData["SubTitle"] = "Доктор";
+}
+
+@{
+    if (Model.doctorsOperationFlag == "Details")
+    {
+        ViewData["Title"] = "Детали профиля";
+    }
+    if (Model.doctorsOperationFlag == "Delete")
+    {
+        ViewData["Title"] = "Удаление профиля"; 
+    }
+}
+
+<div id="details_delete_instance_form" style="margin-top: auto">
+    <div>
+        <h2 id="delete_details_header">@ViewData["Title"]</h2>
+        <h4>@ViewData["SubTitle"]</h4>
+        <hr />
+        <dl id="details_delete_instance_form_dl" class="dl-horizontal" style=" grid-template-columns: max-content">
+            <dt title="@Html.DisplayNameFor(model => (new Doctors()).DoctorsName)">
+                @Html.DisplayNameFor(model => (new Doctors()).DoctorsName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Doctor.DoctorsName)
+            </dd>
+            <dt title="@Html.DisplayNameFor(model => (new Doctors()).DoctorsSpecialization)">
+                @Html.DisplayNameFor(model => (new Doctors()).DoctorsSpecialization)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Doctor.DoctorsSpecialization)
+            </dd>
+            <dt title="@Html.DisplayNameFor(model => (new Doctors()).DoctorsPhoneNumber)">
+                @Html.DisplayNameFor(model => (new Doctors()).DoctorsPhoneNumber)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Doctor.DoctorsPhoneNumber)
+            </dd>
+            <dt title="@Html.DisplayNameFor(model => (new Doctors()).ClinicalDepartment.ClinicalDepartmentName)">
+                @Html.DisplayNameFor(model => (new Doctors()).ClinicalDepartment.ClinicalDepartmentName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Doctor.ClinicalDepartment.ClinicalDepartmentName)
+            </dd>
+        </dl>
+    </div>
+    @* Нижний footer модального окна с кнопками создания и возврата. *@
+    <div class="modal-footer" style="margin-top: 15px;">
+        @if (Model.doctorsOperationFlag == "Details" && User.IsInRole("Registrator"))
+        {
+            <a asp-action="Create" asp-route-id="@Model.Doctor.DoctorsId" class="btn btn-success instances-edit-from-details">Правка</a>
+        }
+        @if (Model.doctorsOperationFlag == "Delete" && User.IsInRole("Registrator"))
+        {
+            <a asp-action="Delete" asp-route-id="@Model.Doctor.DoctorsId" class="btn btn-danger instance-delete-it">Удаление</a>
+        }
+        <button type="button" id="button_back_to_index_from_details_or_delete" class="btn btn-default" data-dismiss="modal" style="display: none">К списку докторов</button>
+        <a asp-action="Index" id="link_back_to_index_from_details_or_delete" class="btn btn-default instances-edit-link">К списку докторов</a>
+    </div>
+</div>

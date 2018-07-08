@@ -1,0 +1,71 @@
+﻿@model TestWork.ViewModels.CustomersIllnesesViewModel
+@{
+    if (User.IsInRole("Registrator"))
+    {
+        ViewData["Title"] = (Model.CustomersIllness.CustomersIllnessesId == 0) ? "Добавление новой записи" : "Изменение записи";
+        ViewData["SubTitle"] = "Запись";
+        ViewData["TitleCustomer"] = ViewBag.CustomerName;
+        ViewData["SubTitleCustomer"] = ViewBag.CustomerBirthday;
+        int customerIdd = ViewBag.CustomerId;
+        Model.customerIdd = customerIdd;
+
+        @if (Model.CustomersIllness.CustomersIllnessesId == 0)
+        {
+            <p id="instance_for_addition" style="display: none"></p>
+        }
+        else
+        {
+            <p id="instance_for_edition" style="display: none"></p>
+
+        }
+        <p id="controller_name" style="display: none">CustomersIllneses</p>
+        <h2 id="instance_header">@ViewData["Title"]</h2>
+        <hr />
+        <h2>@ViewData["TitleCustomer"]</h2>
+        <h4>@ViewData["SubTitleCustomer"]</h4>
+        <hr />
+        <h4>@ViewData["SubTitle"]</h4>
+        <hr />
+        <form asp-action="Create" id="instance_form" data-list-url="@Url.Action("Index")">
+            <div class="row">
+                <div class="col-md-4">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input type="hidden" asp-for="CustomersIllness.CustomersIllnessesId" />
+                    <input type="hidden" asp-for="customerIdd" value="@customerIdd" />
+                    <input type="hidden" asp-for="CustomersIllness.CustomerId" />
+                    @if (Model.CustomersIllness.CustomersIllnessesId != 0)
+                    {
+                        Model.CustomersIllness.CustomersIllnessesrExistedFlag = true;
+                    }
+
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-info-sign">&nbsp;</span><label asp-for="CustomersIllness.CustomersIllnessesName" class="control-label"></label>
+                        <input asp-for="CustomersIllness.CustomersIllnessesName" class="form-control" />
+                        <span asp-validation-for="CustomersIllness.CustomersIllnessesName" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <span class="glyphicon glyphicon-pencil">&nbsp;</span><label asp-for="CustomersIllness.CustomersIllnessesDescription" class="control-label"></label>
+                        <textarea asp-for="CustomersIllness.CustomersIllnessesDescription" class="form-control" id="customer_notes"></textarea>
+                        <span asp-validation-for="CustomersIllness.CustomersIllnessesDescription" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+
+
+            @* Уведомление о невозможности создания недостаточно заполненного профиля. *@
+            <div class="alert alert-danger" id="danger_alert" style="display: none;">
+                <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                <button type="button" class="close" data-dismiss="alert"></button>
+                <strong>Нельзя просто так взять и отправить не полностью заполненный профиль. </strong>
+            </div>
+
+            @* Нижний footer модального окна с кнопками создания и возврата. *@
+            <div class="modal-footer" style="margin-top: 15px;">
+                <input id="button_create" type="submit" value="@((Model.CustomersIllness.CustomersIllnessesId == 0) ? "Добавить" : "Применить изменения")" class="btn btn-success" />
+                <button type="button" id="buttonBackToIndexFromCreateOrEdit" class="btn btn-default" data-dismiss="modal" style="display: none">Назад</button>
+                <a asp-action="Index" id="linkBackToIndexFromCreateOrEdit" class="btn btn-default instances-edit-link">Назад</a>
+            </div>
+        </form>
+    }
+}

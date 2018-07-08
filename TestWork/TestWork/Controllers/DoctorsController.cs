@@ -474,7 +474,6 @@ namespace TestWork.Controllers
                 }
             }
             return new EmptyResult();
-            //return PartialView(doctorAppointment);
         }
 
         // Проверка телефона доктора на дупликацию.

@@ -22,7 +22,7 @@ namespace TestWork.Controllers
             _context = context;
         }
 
-        // GET: Doctors
+        // GET:
         [Authorize(Roles = "Registrator, SimpleUser")]
         public async Task<IActionResult> Index(int? page, int? instancesPerPage, string searchString)
         {
@@ -111,11 +111,28 @@ namespace TestWork.Controllers
         [Authorize(Roles = "Registrator, SimpleUser")]
         public IActionResult Create(int? id, int? userId)
         {
+            int loggedInUserId;
+            Claim user = User.FindFirst(c => c.Type == ClaimTypes.SerialNumber);
+            string userValue = user.Value;
+            Int32.TryParse(userValue, out loggedInUserId);
+
+            if ((userId != loggedInUserId) && (!User.IsInRole("Registrator")))
+            {
+                return View("Forbidden");
+            }
+
             if (id != null || userId != null)
             {
-                if (userId != null)
+                if (userId != null && (_context.Customer.Any(c => c.CustomerExistedFlag && c.UsersId == userId)) && (!User.IsInRole("Registrator")))
                 {
                     id = _context.Customer.FirstOrDefault(c => c.CustomerExistedFlag && c.UsersId == userId).CustomerId;
+                }
+                else
+                {
+                    if (!User.IsInRole("Registrator"))
+                    {
+                        return NotFound();
+                    }
                 }
 
                 var customer = _context.Customer.Include(c => c.Users).ThenInclude(u => u.UserRoles).Where(s => s.CustomerExistedFlag).SingleOrDefault(m => m.CustomerId == id);
@@ -135,6 +152,10 @@ namespace TestWork.Controllers
             }
             else
             {
+                if (!User.IsInRole("Registrator"))
+                {
+                    return View("Forbidden");
+                }
                 // В случае вызова формы создания профиля модальным окном возвращать частичное представление.
                 if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
                 {
@@ -164,6 +185,16 @@ namespace TestWork.Controllers
         [Authorize(Roles = "Registrator, SimpleUser")]
         public IActionResult Create(CustomersViewModel customersViewModel, int? id, int? userId)
         {
+            int loggedInUserId;
+            Claim userCheck = User.FindFirst(c => c.Type == ClaimTypes.SerialNumber);
+            string userValue = userCheck.Value;
+            Int32.TryParse(userValue, out loggedInUserId);
+
+            if ((userId != loggedInUserId) && (!User.IsInRole("Registrator")))
+            {
+                return View("Forbidden");
+            }
+
             // Если в контроллер пришёл id, значит требуется правка, а не создание.
             if (id != null || userId != null)
             {
@@ -173,11 +204,17 @@ namespace TestWork.Controllers
                     return NotFound();
                 }
 
-                if (userId != null)
+                if (userId != null && (_context.Customer.Any(c => c.CustomerExistedFlag && c.UsersId == userId)) && (!User.IsInRole("Registrator")))
                 {
                     id = _context.Customer.FirstOrDefault(c => c.CustomerExistedFlag && c.UsersId == userId).CustomerId;
                 }
-
+                else
+                {
+                    if (!User.IsInRole("Registrator"))
+                    {
+                        return NotFound();
+                    }
+                }
                 // Проверка модели на правильность.
                 if (ModelState.IsValid)
                 {
@@ -242,13 +279,30 @@ namespace TestWork.Controllers
         [Authorize(Roles = "Registrator, SimpleUser")]
         public IActionResult Details(int? id, int? userId, CustomersViewModel customersView)
         {
+            int loggedInUserId;
+            Claim user = User.FindFirst(c => c.Type == ClaimTypes.SerialNumber);
+            string userValue = user.Value;
+            Int32.TryParse(userValue, out loggedInUserId);
+
+            if ((userId != loggedInUserId) && (!User.IsInRole("Registrator")))
+            {
+                return View("Forbidden");
+            }
+
             if (id == null && userId == null)
             {
                 return NotFound();
             }
-            if (userId != null)
+            if (userId != null && (_context.Customer.Any(c => c.CustomerExistedFlag && c.UsersId == userId)) && (!User.IsInRole("Registrator")))
             {
                 id = _context.Customer.FirstOrDefault(c => c.CustomerExistedFlag && c.UsersId == userId).CustomerId;
+            }
+            else
+            {
+                if (!User.IsInRole("Registrator"))
+                {
+                    return NotFound();
+                }
             }
             var instance = _context.Customer.Include(с => с.Users).ThenInclude(u => u.UserRoles).Include(c => c.DoctorsAppointments).SingleOrDefault(m => m.CustomerId == id);
             var doctorAppointments = _context.DoctorsAppointments.Where(d => d.CustomerId == id);

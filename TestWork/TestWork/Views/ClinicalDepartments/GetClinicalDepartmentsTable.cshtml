@@ -44,8 +44,12 @@
                                 @if (User.IsInRole("Registrator"))
                                 {
                                     <a asp-action="Create" asp-route-id="@item.ClinicalDepartmentId" class="instances-edit">Правка |</a>
+                                    <a asp-action="Details" asp-route-id="@item.ClinicalDepartmentId" class="instance-details">Детали |</a>
                                 }
-                                <a asp-action="Details" asp-route-id="@item.ClinicalDepartmentId" class="instance-details">Детали</a> |
+                                else
+                                {
+                                    <a asp-action="Details" asp-route-id="@item.ClinicalDepartmentId" class="instance-details">Детали</a>
+                                }
                                 @if (User.IsInRole("Registrator"))
                                 {
                                     <a asp-action="Delete" asp-route-id="@item.ClinicalDepartmentId" class="instance-delete">Удаление</a>

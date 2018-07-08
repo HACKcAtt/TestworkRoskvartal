@@ -43,7 +43,8 @@
                         Int32.TryParse(userValue, out loggedInUserId);
                         if (!User.IsInRole("Registrator"))
                         {
-                            <li><a href='@Url.Action("Create", "Customers", new { id = loggedInUserId}, null)'><i class="glyphicon glyphicon-cog"></i>&nbsp;Правка профиля&nbsp;</a></li>
+                            <li><a href='@Url.Action("Create", "Customers", new { userId = loggedInUserId}, null)'><i class="glyphicon glyphicon-cog"></i>&nbsp;Правка профиля&nbsp;</a></li>
+                            <li><a href='@Url.Action("Details", "Customers", new { userId = loggedInUserId}, null)'><i class="glyphicon glyphicon-th-list"></i>&nbsp;Детали профиля&nbsp;</a></li>
                         }
                         <li><a asp-area="" asp-controller="Account" asp-action="Logout"><i class="glyphicon glyphicon-log-out"></i>&nbsp;Выход&nbsp;</a></li>
                     }

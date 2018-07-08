@@ -15,12 +15,12 @@ namespace TestWork.Models
         {
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            var lf = new LoggerFactory();
-            lf.AddProvider(new MyLoggerProvider());
-            optionsBuilder.UseLoggerFactory(lf);
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    var lf = new LoggerFactory();
+        //    lf.AddProvider(new MyLoggerProvider());
+        //    optionsBuilder.UseLoggerFactory(lf);
+        //}
 
         public DbSet<TestWork.Models.Customer> Customer { get; set; }
         public DbSet<TestWork.Models.ClinicalDepartment> ClinicalDepartment { get; set; }

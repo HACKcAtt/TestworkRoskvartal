@@ -8,7 +8,7 @@
     string userValue = user.Value;
     Int32.TryParse(userValue, out loggedInUserId);
     bool falgOfUserMatching = false;
-    if (Model.Customers.CustomerId != 0 && Model.Customers.CustomerId == loggedInUserId && !User.IsInRole("Registrator"))
+    if (Model.Customers.CustomerId != 0 && Model.Customers.UsersId == loggedInUserId && !User.IsInRole("Registrator"))
     {
         falgOfUserMatching = true;
     }
@@ -97,8 +97,15 @@
             @* Нижний footer модального окна с кнопками создания и возврата. *@
             <div class="modal-footer" style="margin-top: 15px;">
                 <input id="button_create" type="submit" value="@((Model.Customers.CustomerId == 0) ? "Добавить" : "Применить изменения")" class="btn btn-success" />
-                <button type="button" id="buttonBackToIndexFromCreateOrEdit" class="btn btn-default" data-dismiss="modal" style="display: none">Назад</button>
-                <a asp-action="Index" id="linkBackToIndexFromCreateOrEdit" class="btn btn-default instances-edit-link">Назад</a>
+                @if (User.IsInRole("Registrator"))
+                {
+                    <button type="button" id="buttonBackToIndexFromCreateOrEdit" class="btn btn-default" data-dismiss="modal" style="display: none">Назад</button>
+                    <a asp-action="Index" id="linkBackToIndexFromCreateOrEdit" class="btn btn-default instances-edit-link">Назад</a>
+                }
+                else
+                {
+                    <a href='@Url.Action("Index", "Home", new { customerIdd = Model.Customers.CustomerId }, null)' class="btn btn-default">На главную</a>
+                }
             </div>
         </form>
     }

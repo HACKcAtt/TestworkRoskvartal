@@ -61,14 +61,10 @@
                                 {
                                     <a asp-action="Create" asp-route-id="@item.DoctorsId" class="instances-edit">Правка |</a>
                                 }
-                                @if (!User.IsInRole("Registrator"))
-                                {
-                                    <a asp-action="Details" asp-route-id="@item.DoctorsId" class="instance-details">Детали</a>
-                                }
+                                <a asp-action="Details" asp-route-id="@item.DoctorsId" class="instance-details">Детали </a>|
                                 @if (User.IsInRole("Registrator"))
                                 {
-                                    <a asp-action="Details" asp-route-id="@item.DoctorsId" class="instance-details">Детали</a> |
-                                    < a asp - action = "Delete" asp - route - id = "@item.DoctorsId" class="instance-delete">Удаление |</a>
+                                    <a asp-action = "Delete" asp-route-id = "@item.DoctorsId" class="instance-delete">Удаление |</a>
                                 }
                                 <a asp-action="CreateDoctorsAppointment" asp-route-id="@item.DoctorsId" class="instances-edit">Запись на приём</a>
                             </td>

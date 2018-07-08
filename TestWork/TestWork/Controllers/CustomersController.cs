@@ -109,10 +109,15 @@ namespace TestWork.Controllers
 
         // GET: Customers/Create
         [Authorize(Roles = "Registrator, SimpleUser")]
-        public IActionResult Create(int? id)
+        public IActionResult Create(int? id, int? userId)
         {
-            if (id != null)
+            if (id != null || userId != null)
             {
+                if (userId != null)
+                {
+                    id = _context.Customer.FirstOrDefault(c => c.CustomerExistedFlag && c.UsersId == userId).CustomerId;
+                }
+
                 var customer = _context.Customer.Include(c => c.Users).ThenInclude(u => u.UserRoles).Where(s => s.CustomerExistedFlag).SingleOrDefault(m => m.CustomerId == id);
                 CustomersViewModel instance = new CustomersViewModel();
                 instance.Customers = customer;
@@ -157,15 +162,20 @@ namespace TestWork.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Registrator, SimpleUser")]
-        public IActionResult Create(CustomersViewModel customersViewModel, int? id)
+        public IActionResult Create(CustomersViewModel customersViewModel, int? id, int? userId)
         {
             // Если в контроллер пришёл id, значит требуется правка, а не создание.
-            if (id != null)
+            if (id != null || userId != null)
             {
                 // Если id не соответствуют, то, значит, такого нет, и возвращется HTTP-ответ с кодом 404 ("Не найдено").
                 if (id != customersViewModel.Customers.CustomerId)
                 {
                     return NotFound();
+                }
+
+                if (userId != null)
+                {
+                    id = _context.Customer.FirstOrDefault(c => c.CustomerExistedFlag && c.UsersId == userId).CustomerId;
                 }
 
                 // Проверка модели на правильность.
@@ -230,11 +240,15 @@ namespace TestWork.Controllers
 
         // GET: Customers/Details/5
         [Authorize(Roles = "Registrator, SimpleUser")]
-        public IActionResult Details(int? id, CustomersViewModel customersView)
+        public IActionResult Details(int? id, int? userId, CustomersViewModel customersView)
         {
-            if (id == null)
+            if (id == null && userId == null)
             {
                 return NotFound();
+            }
+            if (userId != null)
+            {
+                id = _context.Customer.FirstOrDefault(c => c.CustomerExistedFlag && c.UsersId == userId).CustomerId;
             }
             var instance = _context.Customer.Include(с => с.Users).ThenInclude(u => u.UserRoles).Include(c => c.DoctorsAppointments).SingleOrDefault(m => m.CustomerId == id);
             var doctorAppointments = _context.DoctorsAppointments.Where(d => d.CustomerId == id);

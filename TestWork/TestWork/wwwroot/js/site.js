@@ -15,6 +15,8 @@ $(document).ready(function () {
     createInstanceNameDuplicationInDatabaseChecking();
     createInstanceEmailDuplicationInDatabaseChecking();
     createInstanceDateTimeForAppointmentChecking();
+    showBlockListener();
+    hideBlockListener();
 
     // Обработка нажатия ссылки создания нового профиля.
     $("#create_instance").on("click", function (event) {

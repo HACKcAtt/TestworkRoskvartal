@@ -1,4 +1,6 @@
 ﻿@{
-    ViewData["Title"] = "Code 403. Forbidden.";
+    ViewData["Title"] = "Данная страница недоступна для просмотра или не существует.";
 }
-<h1><b>@ViewData["Title"]</b></h1>
+<h2 style="color:crimson"><b><i><i class="glyphicon glyphicon-exclamation-sign"></i>&nbsp;@ViewData["Title"]</i></b></h2>
+<hr />
+<a asp-area="" asp-controller="Home" asp-action="Index">На главную страницу</a>

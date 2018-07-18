@@ -33,8 +33,11 @@ namespace TestWork
                     options.LoginPath = new Microsoft.AspNetCore.Http.PathString("/Account/Login");
                 });
 
+            // получаем строку подключения из файла конфигурации
+            string connection = Configuration.GetConnectionString("DBContext");
+            // добавляем контекст MobileContext в качестве сервиса в приложение
             services.AddDbContext<DBContext>(options =>
-                    options.UseMySQL(Configuration.GetConnectionString("DBContext")));
+                options.UseSqlServer(connection));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

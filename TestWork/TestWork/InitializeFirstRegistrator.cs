@@ -38,6 +38,7 @@ namespace TestWork
                         UsersPassword = Salter.Salter.GetHashString("testpass"),
                         UsersPhoneNumber = "+78001234567",
                         UsersExistedFlag = true,
+                        UsersBirthday = "01.01.1984",
                         RolesId = context.Roles.Where(r => r.RolesName == "Registrator").FirstOrDefault().RolesId
                     }
                     );
